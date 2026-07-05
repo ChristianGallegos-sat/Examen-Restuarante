@@ -37,6 +37,16 @@ public class OrderService {
 					"El plato '" + dish.getName() + "' no está disponible actualmente.");
 		}
 
+		InventoryResponse inventory = inventoryClient.getInventory(request.getDishId())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"No existe registro de inventario para el plato con id " + request.getDishId() + "."));
+
+		if (inventory.getStockQuantity() < request.getQuantity()) {
+			throw new BadRequestException(
+					"Stock insuficiente para el plato con id " + request.getDishId()
+							+ ". Disponible: " + inventory.getStockQuantity());
+		}
+
 		Order order = new Order();
 		order.setCustomerName(request.getCustomerName());
 		order.setDishId(request.getDishId());

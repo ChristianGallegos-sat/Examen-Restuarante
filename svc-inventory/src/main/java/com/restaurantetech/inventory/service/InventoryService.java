@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.restaurantetech.inventory.client.MenuServiceClient;
 import com.restaurantetech.inventory.exception.BadRequestException;
 import com.restaurantetech.inventory.exception.ResourceNotFoundException;
 import com.restaurantetech.inventory.model.InventoryItem;
@@ -16,7 +17,13 @@ public class InventoryService {
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
 
+	@Autowired
+	private MenuServiceClient menuServiceClient;
+
 	public InventoryItem create(InventoryItem item) {
+		menuServiceClient.getDish(item.getDishId())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"El plato con id " + item.getDishId() + " no existe en el menú."));
 		return inventoryItemRepository.save(item);
 	}
 
